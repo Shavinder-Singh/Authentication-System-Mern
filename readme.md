@@ -27,3 +27,26 @@ Make Middleware which checks if user is login or role has admin in middleware fi
 
 
 
+Frontend 
+
+npm create vite@latest =>Create React Vite
+-----------------------
+npm install tailwindcss @tailwindcss/vite
+-----------------------
+write in vite config.js
+    import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [
+    tailwindcss(),
+  ],
+})
+--------------------------
+@import "tailwindcss"; in index.css
+npm run dev
+
+
+npm i axios react-router-dom 
+
+Create AuthContext File which crud opertaion function use and data is getting from other files like register pages comes (name,email,password) 

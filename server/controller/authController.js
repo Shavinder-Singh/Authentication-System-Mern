@@ -14,6 +14,13 @@ exports.registerUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
+        // Check required fields
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                message: "Name, email and password are required"
+            });
+        }
+
         //if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -67,6 +74,7 @@ exports.loginUser = async (req, res) => {
     }
 };
 
+
 //Update Password
 
 exports.updatePassword = async (req, res) => {
@@ -74,7 +82,7 @@ exports.updatePassword = async (req, res) => {
         const { newPassword, currentPassword, confirmPassword } = req.body;
 
         // if password is not entered by user
-        if (!password || !currentPassword || !confirmPassword) {
+        if (!newPassword || !currentPassword || !confirmPassword) {
             return res.status(400).json({
                 message: "All Password fields are required"
             })
@@ -94,7 +102,7 @@ exports.updatePassword = async (req, res) => {
             });
         }
 
-        const isMatch = await bcrypt.compare(user.password, currentPassword);
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
             return res.status(400).json({
                 message: "Current password is incorrect"
@@ -118,12 +126,31 @@ exports.updatePassword = async (req, res) => {
 // Delete Password
 exports.deleteAccount = async (req, res) => {
     try {
+        const { currentPassword } = req.body;
+
+        // if password is not entered by user
+        if (!currentPassword) {
+            return res.status(400).json({
+                message: "Please Enter Password To Delete Account"
+            })
+        }
+
+        //Find A user By Id
         const user = await User.findById(req.params.id);
         if (!user) {
-            return res.status(404).json({ message: "User Not Found" })
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({
+                message: "password is incorrect"
+            });
         }
         await user.deleteOne();
-         return res.status(200).json({
+        return res.status(200).json({
             message: "Account deleted successfully"
         });
     }
